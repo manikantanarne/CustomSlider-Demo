@@ -15,11 +15,14 @@ class ViewController: UIViewController {
     let upperValueLbl = UILabel()
     var sliderLowerValue:CGFloat = 200.0
     var sliderUpperValue:CGFloat = 800.0
+    var previousMinPosition:CGFloat?
+    var previousMaxPosition:CGFloat?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        //Customize and add slider
         slider.backgroundColor = UIColor.clear
         slider.minimumValue = 10.0
         slider.maximumValue = 10000.0
@@ -35,30 +38,28 @@ class ViewController: UIViewController {
         
         view.addSubview(slider)
         
-        let stack = UIStackView(frame: CGRect(x: 20, y: view.bounds.height/2 - 100, width: view.bounds.width - 40, height: 25))
-        stack.distribution = .fillEqually
-        stack.axis = .horizontal
-        stack.spacing = 50
-        
-        view.addSubview(stack)
-        
+        //add labels
+        lowerValueLbl.frame = CGRect(x: 0, y: 0, width: 50, height: 25)
         lowerValueLbl.text = "\(Int(sliderLowerValue))"
         lowerValueLbl.textColor = UIColor.black
         lowerValueLbl.textAlignment = .center
-        lowerValueLbl.layer.borderColor = UIColor.red.cgColor
-        lowerValueLbl.layer.borderWidth = 1.0
+        lowerValueLbl.font = UIFont.systemFont(ofSize: 11.0)
+        lowerValueLbl.backgroundColor = UIColor.lightGray
+        lowerValueLbl.layer.cornerRadius = 5
         lowerValueLbl.clipsToBounds = true
 
-        stack.addArrangedSubview(lowerValueLbl)
+        view.addSubview(lowerValueLbl)
 
+        upperValueLbl.frame = CGRect(x: 0, y: 0, width: 50, height: 25)
         upperValueLbl.text = "\(Int(sliderUpperValue))"
         upperValueLbl.textColor = UIColor.black
         upperValueLbl.textAlignment = .center
-        upperValueLbl.layer.borderColor = UIColor.red.cgColor
-        upperValueLbl.layer.borderWidth = 1.0
+        upperValueLbl.font = UIFont.systemFont(ofSize: 11.0)
+        upperValueLbl.backgroundColor = UIColor.lightGray
+        upperValueLbl.layer.cornerRadius = 5
         upperValueLbl.clipsToBounds = true
 
-        stack.addArrangedSubview(upperValueLbl)
+        view.addSubview(upperValueLbl)
     }
     
     override func viewDidLayoutSubviews() {
@@ -80,6 +81,43 @@ extension ViewController:TwoWaySliderProtocol {
         sliderUpperValue = CGFloat(upperValue)
         lowerValueLbl.text = "\(Int(lowerValue))"
         upperValueLbl.text = "\(Int(upperValue))"
+    }
+    
+    func positionChangesForThumbs(minThumbPosition: CGPoint, maxThumbPosition: CGPoint, isMinThumbMoving:Bool, isMaxThumbMoving:Bool) {
+        
+        lowerValueLbl.frame.size.width = lowerValueLbl.intrinsicContentSize.width + 5
+        upperValueLbl.frame.size.width = upperValueLbl.intrinsicContentSize.width + 5
+        
+        lowerValueLbl.center.x = minThumbPosition.x
+        upperValueLbl.center.x = maxThumbPosition.x
+        lowerValueLbl.center.y = minThumbPosition.y
+        upperValueLbl.center.y = maxThumbPosition.y
+        
+        if lowerValueLbl.frame.intersects(upperValueLbl.frame) {
+            if isMinThumbMoving == true {
+                if lowerValueLbl.frame.maxX < upperValueLbl.frame.maxX - upperValueLbl.bounds.width/2 {
+                    upperValueLbl.center.x = lowerValueLbl.frame.maxX + upperValueLbl.bounds.width/2
+                }else {
+                    if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
+                        lowerValueLbl.center.x = positionMin
+                        upperValueLbl.center.x = positionMax
+                    }
+                }
+            }else if isMaxThumbMoving == true {
+                if upperValueLbl.frame.minX > lowerValueLbl.frame.maxX - lowerValueLbl.bounds.width/2 {
+                    lowerValueLbl.center.x = upperValueLbl.frame.minX - lowerValueLbl.bounds.width/2
+                }else {
+                    if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
+                        lowerValueLbl.center.x = positionMin
+                        upperValueLbl.center.x = positionMax
+                    }
+                }
+            }
+//            upperValueLbl.center.x += lowerValueLbl.frame.maxX - upperValueLbl.frame.minX
+        }
+        
+        previousMinPosition = lowerValueLbl.center.x
+        previousMaxPosition = upperValueLbl.center.x
     }
 }
 

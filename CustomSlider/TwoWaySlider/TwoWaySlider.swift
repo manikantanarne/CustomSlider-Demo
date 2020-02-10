@@ -10,6 +10,7 @@ import UIKit
 
 @objc protocol TwoWaySliderProtocol {
     func sliderValueChanges(lowerValue:Double, upperValue:Double)
+    @objc optional func positionChangesForThumbs(minThumbPosition:CGPoint, maxThumbPosition:CGPoint, isMinThumbMoving:Bool, isMaxThumbMoving:Bool)
 }
 
 class TwoWaySlider: UIControl {
@@ -142,6 +143,8 @@ class TwoWaySlider: UIControl {
         shapeLayerMax.setNeedsDisplay()
         
         CATransaction.commit()
+        
+        delegate?.positionChangesForThumbs?(minThumbPosition: CGPoint(x: shapeLayerMin.frame.minX + frame.minX + thumbWidth/2, y: frame.minY - frame.size.height/2 - thumbWidth/2), maxThumbPosition: CGPoint(x: shapeLayerMax.frame.minX + frame.minX + thumbWidth/2, y: frame.minY - frame.size.height/2 - thumbWidth/2), isMinThumbMoving: shapeLayerMin.isMoving, isMaxThumbMoving: shapeLayerMax.isMoving)
     }
     
     // get position for the thumb according to value
