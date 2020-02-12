@@ -13,8 +13,8 @@ class ViewController: UIViewController {
     let slider = TwoWaySlider(frame: .zero)
     let lowerValueLbl = UILabel()
     let upperValueLbl = UILabel()
-    var sliderLowerValue:CGFloat = 200.0
-    var sliderUpperValue:CGFloat = 800.0
+    var sliderLowerValue:CGFloat = 10.0
+    var sliderUpperValue:CGFloat = 10000.0
     var previousMinPosition:CGFloat?
     var previousMaxPosition:CGFloat?
     
@@ -28,12 +28,12 @@ class ViewController: UIViewController {
         slider.maximumValue = 10000.0
         slider.lowerValue = sliderLowerValue
         slider.upperValue = sliderUpperValue
-        slider.thumbStrokeWidth = 1.5
-        slider.thumbStrokeColor = UIColor.black
-        slider.thumbColor = UIColor.red
-        slider.rangeLineHeight = 5.0
-        slider.rangeLineColor = UIColor.lightGray
-        slider.rangeLineHighlightColor = UIColor.blue
+        slider.thumbBorderWidth = 1.5
+        slider.thumbBorderColor = UIColor.lightGray
+        slider.thumbTintColor = UIColor(red: 0.0/255.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+        slider.trackHeight = 5.0
+        slider.trackTintColor = UIColor.lightGray
+        slider.trackHighlightTintColor = UIColor(red: 0.0/255.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1.0)
         slider.delegate = self
         
         view.addSubview(slider)
@@ -65,7 +65,7 @@ class ViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         let margin: CGFloat = 20
         let width = view.bounds.width - 2 * margin
-        let height: CGFloat = 30
+        let height: CGFloat = 40
         
         slider.frame = CGRect(x: 0, y: 0, width: width, height: height)
         slider.center = view.center

@@ -28,13 +28,13 @@ class TWThumbShapeLayer: CALayer {
         let thumbPath = UIBezierPath(roundedRect: shapeFrame, cornerRadius: cornerRadius)
         
         // Fill
-        ctx.setFillColor(slider.thumbColor.cgColor)
+        ctx.setFillColor(slider.thumbTintColor.cgColor)
         ctx.addPath(thumbPath.cgPath)
         ctx.fillPath()
         
         // Outline
-        ctx.setStrokeColor(slider.thumbStrokeColor.cgColor)
-        ctx.setLineWidth(slider.thumbStrokeWidth)
+        ctx.setStrokeColor(slider.thumbBorderColor.cgColor)
+        ctx.setLineWidth(slider.thumbBorderWidth)
         ctx.addPath(thumbPath.cgPath)
         ctx.strokePath()
         
@@ -61,11 +61,11 @@ class TWTrackShapeLayer: CALayer {
         let path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         ctx.addPath(path.cgPath)
         
-        ctx.setFillColor(slider.rangeLineColor.cgColor)
+        ctx.setFillColor(slider.trackTintColor.cgColor)
         ctx.addPath(path.cgPath)
         ctx.fillPath()
         
-        ctx.setFillColor(slider.rangeLineHighlightColor.cgColor)
+        ctx.setFillColor(slider.trackHighlightTintColor.cgColor)
         let lowerValuePosition = CGFloat(slider.positionForValue(slider.lowerValue))
         let upperValuePosition = CGFloat(slider.positionForValue(slider.upperValue))
         let rect = CGRect(x: lowerValuePosition, y: 0.0, width: upperValuePosition - lowerValuePosition, height: bounds.height)
