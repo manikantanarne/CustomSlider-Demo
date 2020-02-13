@@ -24,7 +24,7 @@ class TwoWaySlider: UIControl {
             if lowerValue < minimumValue {
                 lowerValue = minimumValue
             }
-            outputLowerValue = lowerValue/(bounds.width/bounds.height)
+//            outputLowerValue = lowerValue///(bounds.width/bounds.height)
             updateLayerFrames()
         }
     }
@@ -34,7 +34,7 @@ class TwoWaySlider: UIControl {
             if upperValue > maximumValue {
                 upperValue = maximumValue
             }
-            outputUpperValue = upperValue/(bounds.width/bounds.height)
+//            outputUpperValue = upperValue///(bounds.width/bounds.height)
             updateLayerFrames()
         }
     }
@@ -62,9 +62,6 @@ class TwoWaySlider: UIControl {
     private let shapeLayerMax = TWThumbShapeLayer()
     private var previousPoint = CGPoint()
     
-    private var outputLowerValue:CGFloat!
-    private var outputUpperValue:CGFloat!
-    
     private var widthMultiplier:CGFloat {
         if (10...110).contains(upperValue) {
             return 5
@@ -87,6 +84,7 @@ class TwoWaySlider: UIControl {
     override public init(frame: CGRect) {
         super.init(frame: frame)
         initializeLayers()
+        updateLayerFrames()
     }
     
     required public init?(coder: NSCoder) {
@@ -125,12 +123,13 @@ class TwoWaySlider: UIControl {
         trackLayer.frame = CGRect(x: thumbWidth/2, y: thumbWidth/2 - trackHeight/2, width: bounds.width - thumbWidth, height: trackHeight)
         trackLayer.setNeedsDisplay()
         
-        let lowerThumbCenter = CGFloat(positionForValue(lowerValue))
+
+        let lowerThumbCenter = positionForThumb(For: lowerValue)//CGFloat(positionForValue(lowerValue))
         shapeLayerMin.frame = CGRect(x: lowerThumbCenter, y: 0.0, width: thumbWidth, height: thumbWidth)
         
         shapeLayerMin.setNeedsDisplay()
         
-        let upperThumbCenter = CGFloat(positionForValue(upperValue))
+        let upperThumbCenter = positionForThumb(For: upperValue)//CGFloat(positionForValue(upperValue))
         shapeLayerMax.frame = CGRect(x: upperThumbCenter, y: 0.0, width: thumbWidth, height: thumbWidth)
         
         shapeLayerMax.setNeedsDisplay()
@@ -138,19 +137,6 @@ class TwoWaySlider: UIControl {
         CATransaction.commit()
         
         delegate?.positionChangesForThumbs?(minThumbPosition: CGPoint(x: shapeLayerMin.frame.minX + frame.minX + thumbWidth/2, y: frame.minY - frame.size.height/2 - thumbWidth/2), maxThumbPosition: CGPoint(x: shapeLayerMax.frame.minX + frame.minX + thumbWidth/2, y: frame.minY - frame.size.height/2 - thumbWidth/2), isMinThumbMoving: shapeLayerMin.isMoving, isMaxThumbMoving: shapeLayerMax.isMoving)
-    }
-    
-    // get position for the thumb according to value
-    func positionForValue(_ value: CGFloat) -> CGFloat {
-        return (bounds.width - thumbWidth) * (value - minimumValue) /
-            (maximumValue - minimumValue) //+ (thumbWidth/2.0)
-    }
-    
-    // bound value with lower and upper values
-    private func boundValue(_ value: CGFloat, toLowerValue lowerValue: CGFloat, upperValue: CGFloat) -> CGFloat {
-        let bound = min(max(value, lowerValue), upperValue)
-//        print("bound-----> \(bound)")
-        return bound
     }
     
 }
@@ -181,113 +167,117 @@ extension TwoWaySlider {
             }
         }
         
-        //        if shapeLayerMin.frame.contains(previousPoint) && shapeLayerMax.frame.contains(previousPoint) {
-        //            shapeLayerMax.isMoving = true
-        //            shapeLayerMin.isMoving = false
-        //        }else if shapeLayerMin.frame.contains(previousPoint) {
-        //
-        //            shapeLayerMin.isMoving = true
-        //            shapeLayerMax.isMoving = false
-        //
-        //        }else if shapeLayerMax.frame.contains(previousPoint) {
-        //
-        //            shapeLayerMax.isMoving = true
-        //            shapeLayerMin.isMoving = false
-        //        }
-        
         return shapeLayerMin.isMoving || shapeLayerMax.isMoving
     }
     
     override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
         let position = touch.location(in: self)
         
-        let deltaPoints = position.x - previousPoint.x
-//        print("deltaPoints-----> \(deltaPoints)")
-        let deltaValue = (maximumValue - minimumValue) * deltaPoints/(bounds.width - bounds.height)
-//        print("deltaValue-----> \(deltaValue)")
-        previousPoint = position
-        
         if shapeLayerMin.isMoving == true {
-            lowerValue = boundValue(lowerValue + deltaValue, toLowerValue: minimumValue, upperValue: upperValue - gapBetweenThumbs)
-//            calculation()
+            if position.x >= thumbWidth/2 && position.x <= (bounds.width - thumbWidth/2) && position.x <= shapeLayerMax.position.x {
+                lowerValue = calculateValue(At: position)
+                lowerValue = (lowerValue < minimumValue) ? minimumValue : lowerValue
+            }
         }else if shapeLayerMax.isMoving == true {
-            upperValue = boundValue(upperValue + deltaValue, toLowerValue: lowerValue + gapBetweenThumbs, upperValue: maximumValue)
+            if position.x <= (bounds.width - thumbWidth/2) && position.x >= thumbWidth/2 && position.x >= shapeLayerMin.position.x {
+                upperValue = calculateValue(At: position)
+                upperValue = (upperValue > maximumValue) ? maximumValue : upperValue
+            }
         }
         
-        outputLowerValue = lowerValue//getSelectedLowerValue(value: lowerValue)
-//        print("outputLowerValue-----> \(String(describing: outputLowerValue))")
-        outputUpperValue = upperValue//getSelectedUpperValue(value: upperValue)
-//        print("outputUpperValue-----> \(String(describing: outputUpperValue))")
-        
-        delegate?.sliderValueChanges(lowerValue: Double(outputLowerValue), upperValue: Double(outputUpperValue))
-        
+        delegate?.sliderValueChanges(lowerValue: Double(lowerValue), upperValue: Double(upperValue))
         return true
     }
     
-    private func getSelectedLowerValue(value:CGFloat) -> CGFloat {
-        let actualPosition = shapeLayerMin.position.x - thumbWidth/2
-        if Int(outputLowerValue) < 110/*actualPosition < (bounds.width * 0.25)*/ {
-            print("value -----> \(value)")
-            print("exact-----> \(value/(bounds.width/bounds.height))")
-            print("addition-----> \(value/(bounds.width/bounds.height))")
-            return (value/(bounds.width/bounds.height))
-//            return lowerValue - ((bounds.width/bounds.height) - 1)
-        }else if (110..<250).contains(Int(outputLowerValue))/*actualPosition > (bounds.width * 0.25) && actualPosition < (bounds.width * 0.25 + bounds.width * 0.175)*/ {
-            print("value -----> \(value)")
-            print("exact-----> \(value/(bounds.width/bounds.height))")
-            print("addition-----> \((value + (bounds.width/bounds.height))/(bounds.width/bounds.height))")
-            return (value + (bounds.width/bounds.height))/(bounds.width/bounds.height)
-        }else if (250..<1000).contains(outputLowerValue)/*actualPosition > (bounds.width * 0.25 + bounds.width * 0.175) && actualPosition < (bounds.width * 0.25 + bounds.width * 0.175 + bounds.width * 0.375)*/ {
-            return (value/(bounds.width/bounds.height)) + 5
+    internal func positionForThumb(For value:CGFloat) -> CGFloat {
+        let trackWidth = bounds.width - thumbWidth
+        if value <= 110 {
+            let currentValue = value - 10
+            let width = trackWidth*0.25
+            let stepSize = width/100
+            let stepsMoved = currentValue/1
+            let positionMovedTo =  stepsMoved * stepSize
+            return positionMovedTo
+        }else if value > 110 && value <= 250 {
+            let currentValue = value - 110
+            let previousSectionWidth = trackWidth*0.25
+            let currentSectionWidth = trackWidth*0.175
+            let stepSize = currentSectionWidth/70
+            let stepsMoved = currentValue/2
+            let positionMovedTo = stepsMoved * stepSize
+            return positionMovedTo + previousSectionWidth
+        }else if value > 250 && value <= 1000 {
+            let currentValue = value - 250
+            let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175
+            let currentSectionWidth = trackWidth*0.375
+            let stepSize = currentSectionWidth/150
+            let stepsMoved = currentValue/5
+            let positionMovedTo = stepsMoved * stepSize
+            return positionMovedTo + previousSectionsWidth
         }else {
-            return (value/(bounds.width/bounds.height)) + 100
+            let currentValue = value - 1000
+            let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
+            let currentSectionWidth = trackWidth - previousSectionsWidth
+            let stepSize = currentSectionWidth/90
+            let stepsMoved = currentValue/100
+            let positionMovedTo = stepsMoved * stepSize
+            return positionMovedTo + previousSectionsWidth
         }
     }
     
-    private func getSelectedUpperValue(value:CGFloat) -> CGFloat {
-        let actualPosition = shapeLayerMax.position.x - thumbWidth/2
-        if actualPosition < (bounds.width * 0.25) {
-//            return closestNumber(n: (value/(bounds.width/bounds.height)), m: 1)
-            return closestNumber(n: 100 * actualPosition/(bounds.width * 0.25), m: 1)
-        }else if actualPosition > (bounds.width * 0.25) && actualPosition < (bounds.width * 0.25 + bounds.width * 0.175) {
-//            return closestNumber(n: (value/(bounds.width/bounds.height)) * 2, m: 2)
-            return closestNumber(n: 70 * actualPosition/((bounds.width * 0.25) + (bounds.width * 0.175)), m: 2)
-        }else if actualPosition > (bounds.width * 0.25 + bounds.width * 0.175) && actualPosition < (bounds.width * 0.25 + bounds.width * 0.175 + bounds.width * 0.375) {
-//            return closestNumber(n: (value/(bounds.width/bounds.height)) * 5, m: 5)
-            return closestNumber(n: 150 * actualPosition/((bounds.width * 0.25) + (bounds.width * 0.175) + (bounds.width * 0.375)), m: 5)
+    private func calculateValue(At position:CGPoint) -> CGFloat {
+        let trackWidth = bounds.width - thumbWidth
+        let xPosition = position.x - thumbWidth/2
+        if xPosition <= trackWidth*0.25 {
+            let width = trackWidth*0.25
+            let stepSize = width/100
+            let positionMovedTo = width - xPosition
+            let value = 10 + (100 - (positionMovedTo/stepSize))
+            print("value1-----> \(value)")
+            return value
+        }else if xPosition > trackWidth*0.25 && xPosition <= (trackWidth*0.25 + trackWidth*0.175) {
+            let previousSectionWidth = trackWidth*0.25
+            let currentSectionWidth = trackWidth*0.175
+            let stepSize = currentSectionWidth/70
+            let positionMovedTo = xPosition - previousSectionWidth
+            let stepsMoved = positionMovedTo/stepSize
+            let stepsValue = stepsMoved * 2
+            var value = 110 + stepsValue
+            
+            if Int(value)%2 != 0 {
+                value = CGFloat((Int(value)/2)*2)
+            }
+            
+            print("value2-----> \(value)")
+            return value
+            
+        }else if xPosition > (trackWidth*0.25 + trackWidth*0.175) && xPosition <= (trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375) {
+            let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175
+            let currentSectionWidth = trackWidth*0.375
+            let stepSize = currentSectionWidth/150
+            let positionMovedTo = xPosition - previousSectionsWidth
+            let stepsMoved = positionMovedTo/stepSize
+            let stepsValue = stepsMoved * 5
+            var value = 250 + stepsValue
+            if Int(value)%5 != 0 {
+                value = CGFloat((Int(value)/5)*5)
+            }
+            print("value3-----> \(value)")
+            return value
+            
         }else {
-//            return closestNumber(n: (value/(bounds.width/bounds.height)) * 100, m: 100)
-            return closestNumber(n: 90 * actualPosition/bounds.width, m: 100)
-        }
-    }
-    
-//    private func getNumberForSecondStep(value:CGFloat) -> CGFloat {
-//        if value > 110 {
-//            if value.truncatingRemainder(dividingBy: 2) == 0 {
-//                return
-//            }else {
-//                return value + 1
-//            }
-//        }
-//    }
-    
-    private func closestNumber(n: CGFloat, m: CGFloat) -> CGFloat { // find the quotient
-        let q = n / m
-        // 1st possible closest number
-        let n1 = m * q
-        // 2nd possible closest number
-        let n2 = (n * m > 0) ? m * (q + 1) : m * (q - 1)
-        // if true, then n1 is the required closest number
-        return (abs(n - n1) < abs(n - n2)) ? n1 : n2
-        // else n2 is the required closest number
-    }
-    
-    func calculation() {
-        
-        let multiplier = bounds.width/410
-        if (shapeLayerMin.position.x - thumbWidth/2) < bounds.width*0.25 {
-            let value = (shapeLayerMin.position.x - thumbWidth/2)/(multiplier*100)
-            print("value-----> \(value)")
+            let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
+            let currentSectionWidth = trackWidth - previousSectionsWidth
+            let stepSize = currentSectionWidth/90
+            let positionMovedTo = xPosition - previousSectionsWidth
+            let stepsMoved = positionMovedTo/stepSize
+            let stepsValue = stepsMoved * 100
+            var value = 1000 + stepsValue
+            if Int(value)%100 != 0 {
+                value = CGFloat((Int(value)/100) * 100)
+            }
+            print("value4-----> \(value)")
+            return value
         }
     }
     

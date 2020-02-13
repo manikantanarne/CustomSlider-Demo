@@ -13,8 +13,8 @@ class ViewController: UIViewController {
     let slider = TwoWaySlider(frame: .zero)
     let lowerValueLbl = UILabel()
     let upperValueLbl = UILabel()
-    var sliderLowerValue:CGFloat = 10.0
-    var sliderUpperValue:CGFloat = 10000.0
+    var sliderLowerValue:CGFloat = 100.0
+    var sliderUpperValue:CGFloat = 1000.0
     var previousMinPosition:CGFloat?
     var previousMaxPosition:CGFloat?
     
@@ -23,6 +23,12 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         //Customize and add slider
+        let margin: CGFloat = 20
+        let width = view.bounds.width - 2 * margin
+        let height: CGFloat = 40
+        
+        slider.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        slider.center = view.center
         slider.backgroundColor = UIColor.clear
         slider.minimumValue = 10.0
         slider.maximumValue = 10000.0
@@ -39,7 +45,7 @@ class ViewController: UIViewController {
         view.addSubview(slider)
         
         //add labels
-        lowerValueLbl.frame = CGRect(x: 0, y: 0, width: 50, height: 25)
+        lowerValueLbl.frame = CGRect(x: 0, y: 0, width: 100, height: 25)
         lowerValueLbl.text = "\(Int(sliderLowerValue))"
         lowerValueLbl.textColor = UIColor.black
         lowerValueLbl.textAlignment = .center

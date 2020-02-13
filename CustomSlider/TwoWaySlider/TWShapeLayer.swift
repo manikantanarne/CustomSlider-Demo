@@ -66,8 +66,8 @@ class TWTrackShapeLayer: CALayer {
         ctx.fillPath()
         
         ctx.setFillColor(slider.trackHighlightTintColor.cgColor)
-        let lowerValuePosition = CGFloat(slider.positionForValue(slider.lowerValue))
-        let upperValuePosition = CGFloat(slider.positionForValue(slider.upperValue))
+        let lowerValuePosition = CGFloat(slider.positionForThumb(For: slider.lowerValue))
+        let upperValuePosition = CGFloat(slider.positionForThumb(For: slider.upperValue))
         let rect = CGRect(x: lowerValuePosition, y: 0.0, width: upperValuePosition - lowerValuePosition, height: bounds.height)
         ctx.fill(rect)
     }
