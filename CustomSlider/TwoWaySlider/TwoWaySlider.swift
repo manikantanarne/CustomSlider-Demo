@@ -191,90 +191,134 @@ extension TwoWaySlider {
     
     internal func positionForThumb(For value:CGFloat) -> CGFloat {
         let trackWidth = bounds.width - thumbWidth
-        if value <= 110 {
-            let currentValue = value - 10
+        
+        let rangeMultiplier:Int = (minimumValue > 10) ? Int(minimumValue)/10 : 1
+        
+        if value <= (110 * CGFloat(rangeMultiplier)) {
+            
+            let currentValue = value - minimumValue
+            var currentSectionSteps:CGFloat = 100
+            let additionalSteps = (minimumValue < (10 * CGFloat(rangeMultiplier))) ? (10 * CGFloat(rangeMultiplier)) - minimumValue : 0
+            currentSectionSteps += additionalSteps
             let width = trackWidth*0.25
-            let stepSize = width/100
-            let stepsMoved = currentValue/1
+            let stepSize = width/currentSectionSteps
+            let stepsMoved = currentValue/(1 * CGFloat(rangeMultiplier))
             let positionMovedTo =  stepsMoved * stepSize
+            
             return positionMovedTo
-        }else if value > 110 && value <= 250 {
-            let currentValue = value - 110
+            
+        }else if value > (110 * CGFloat(rangeMultiplier)) && value <= (250 * CGFloat(rangeMultiplier)) {
+            
+            let currentValue = value - (110 * CGFloat(rangeMultiplier))
             let previousSectionWidth = trackWidth*0.25
             let currentSectionWidth = trackWidth*0.175
-            let stepSize = currentSectionWidth/70
-            let stepsMoved = currentValue/2
+            let currentSectionSteps:CGFloat = 70
+            let stepSize = currentSectionWidth/currentSectionSteps
+            let stepsMoved = currentValue/(2 * CGFloat(rangeMultiplier))
             let positionMovedTo = stepsMoved * stepSize
+            
             return positionMovedTo + previousSectionWidth
-        }else if value > 250 && value <= 1000 {
-            let currentValue = value - 250
+            
+        }else if value > (250 * CGFloat(rangeMultiplier)) && value <= (1000 * CGFloat(rangeMultiplier)) {
+            
+            let currentValue = value - (250 * CGFloat(rangeMultiplier))
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175
             let currentSectionWidth = trackWidth*0.375
-            let stepSize = currentSectionWidth/150
-            let stepsMoved = currentValue/5
+            let currentSectionSteps:CGFloat = 150
+            let stepSize = currentSectionWidth/currentSectionSteps
+            let stepsMoved = currentValue/(5 * CGFloat(rangeMultiplier))
             let positionMovedTo = stepsMoved * stepSize
+            
             return positionMovedTo + previousSectionsWidth
+            
         }else {
-            let currentValue = value - 1000
+            
+            let currentValue = value - (1000 * CGFloat(rangeMultiplier))
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
             let currentSectionWidth = trackWidth - previousSectionsWidth
-            let stepSize = currentSectionWidth/90
-            let stepsMoved = currentValue/100
+            let currentSectionSteps:CGFloat = 90
+            let stepSize = currentSectionWidth/currentSectionSteps
+            let stepsMoved = currentValue/(100 * CGFloat(rangeMultiplier))
             let positionMovedTo = stepsMoved * stepSize
+            
             return positionMovedTo + previousSectionsWidth
         }
     }
     
     private func calculateValue(At position:CGPoint) -> CGFloat {
+        
+        let rangeMultiplier:Int = (minimumValue > 10) ? Int(minimumValue)/10 : 1
+        
         let trackWidth = bounds.width - thumbWidth
         let xPosition = position.x - thumbWidth/2
+        
         if xPosition <= trackWidth*0.25 {
-            let width = trackWidth*0.25
-            let stepSize = width/100
-            let positionMovedTo = width - xPosition
-            let value = 10 + (100 - (positionMovedTo/stepSize))
-            print("value1-----> \(value)")
+            
+            let currentSectionWidth = trackWidth*0.25
+            var currentSectionSteps:CGFloat = 100
+            let additionalSteps = (minimumValue < 10*CGFloat(rangeMultiplier)) ? (10*CGFloat(rangeMultiplier)) - minimumValue : 0
+            currentSectionSteps += additionalSteps
+            let stepSize = currentSectionWidth/currentSectionSteps
+            let positionMovedTo = xPosition - 0
+            let stepsMoved = positionMovedTo/stepSize
+            print("stepsMoved-----> \(Int(stepsMoved))")
+            let stepsValue = Int(stepsMoved) * (1 * rangeMultiplier)
+            let value = minimumValue + CGFloat(stepsValue)
+//            print("value1-----> \(value)")
+            
             return value
+            
         }else if xPosition > trackWidth*0.25 && xPosition <= (trackWidth*0.25 + trackWidth*0.175) {
+            
             let previousSectionWidth = trackWidth*0.25
             let currentSectionWidth = trackWidth*0.175
-            let stepSize = currentSectionWidth/70
+            let currentSectionSteps:CGFloat = 70
+            let stepSize = currentSectionWidth/currentSectionSteps
             let positionMovedTo = xPosition - previousSectionWidth
             let stepsMoved = positionMovedTo/stepSize
-            let stepsValue = stepsMoved * 2
-            var value = 110 + stepsValue
+            let stepMultiplier = (2 * rangeMultiplier)
+            let stepsValue = Int(stepsMoved) * stepMultiplier
+            var value = (110 * CGFloat(rangeMultiplier)) + CGFloat(stepsValue)
             
-            if Int(value)%2 != 0 {
-                value = CGFloat((Int(value)/2)*2)
+            if Int(value)%stepMultiplier != 0 {
+                value = CGFloat((Int(value)/stepMultiplier)*stepMultiplier)
             }
             
-            print("value2-----> \(value)")
+//            print("value2-----> \(value)")
+            
             return value
             
         }else if xPosition > (trackWidth*0.25 + trackWidth*0.175) && xPosition <= (trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375) {
+            
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175
             let currentSectionWidth = trackWidth*0.375
-            let stepSize = currentSectionWidth/150
+            let currentSectionSteps:CGFloat = 150
+            let stepSize = currentSectionWidth/currentSectionSteps
             let positionMovedTo = xPosition - previousSectionsWidth
             let stepsMoved = positionMovedTo/stepSize
-            let stepsValue = stepsMoved * 5
-            var value = 250 + stepsValue
-            if Int(value)%5 != 0 {
-                value = CGFloat((Int(value)/5)*5)
+            let stepMultiplier = (5 * rangeMultiplier)
+            let stepsValue = Int(stepsMoved) * stepMultiplier
+            var value = (250 * CGFloat(rangeMultiplier)) + CGFloat(stepsValue)
+            if Int(value)%stepMultiplier != 0 {
+                value = CGFloat((Int(value)/stepMultiplier)*stepMultiplier)
             }
             print("value3-----> \(value)")
+            
             return value
             
         }else {
+            
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
             let currentSectionWidth = trackWidth - previousSectionsWidth
-            let stepSize = currentSectionWidth/90
+            let currentSectionSteps:CGFloat = 90
+            let stepSize = currentSectionWidth/currentSectionSteps
             let positionMovedTo = xPosition - previousSectionsWidth
             let stepsMoved = positionMovedTo/stepSize
-            let stepsValue = stepsMoved * 100
-            var value = 1000 + stepsValue
-            if Int(value)%100 != 0 {
-                value = CGFloat((Int(value)/100) * 100)
+            let stepMultiplier = (100 * rangeMultiplier)
+            let stepsValue = Int(stepsMoved) * stepMultiplier
+            var value = (1000 * CGFloat(rangeMultiplier)) + CGFloat(stepsValue)
+            if Int(value)%stepMultiplier != 0 {
+                value = CGFloat((Int(value)/stepMultiplier) * stepMultiplier)
             }
             print("value4-----> \(value)")
             return value
