@@ -175,24 +175,28 @@ extension TwoWaySlider {
         
         if shapeLayerMin.isMoving == true {
             
-            if position.x == thumbWidth/2 {
+            if position.x <= thumbWidth/2 {
                 lowerValue = minimumValue
             }
             
             if position.x > thumbWidth/2 && position.x <= (bounds.width - thumbWidth/2) && position.x <= shapeLayerMax.position.x {
                 lowerValue = calculateValue(At: position)
                 lowerValue = (lowerValue < minimumValue) ? minimumValue : lowerValue
+            }else if position.x > thumbWidth/2 {
+                lowerValue = upperValue
             }
             
         }else if shapeLayerMax.isMoving == true {
             
-            if position.x == (bounds.width - thumbWidth/2) {
+            if position.x >= (bounds.width - thumbWidth/2) {
                 upperValue = maximumValue
             }
             
             if position.x < (bounds.width - thumbWidth/2) && position.x >= thumbWidth/2 && position.x >= shapeLayerMin.position.x {
                 upperValue = calculateValue(At: position)
                 upperValue = (upperValue > maximumValue) ? maximumValue : upperValue
+            }else if position.x < (bounds.width - thumbWidth/2) {
+                upperValue = lowerValue
             }
         }
         
