@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     let slider = TwoWaySlider(frame: .zero)
     let lowerValueLbl = UILabel()
     let upperValueLbl = UILabel()
-    var sliderLowerValue:CGFloat = 1000.0
+    var sliderLowerValue:CGFloat = 10000.0
     var sliderUpperValue:CGFloat = 100000.0
     var previousMinPosition:CGFloat?
     var previousMaxPosition:CGFloat?
@@ -25,8 +25,8 @@ class ViewController: UIViewController {
         //Customize and add slider
        
         slider.backgroundColor = UIColor.clear
-        slider.minimumValue = 700.0
-        slider.maximumValue = 700000.0
+        slider.minimumValue = 1120.0
+        slider.maximumValue = 1120000.0
         slider.lowerValue = sliderLowerValue
         slider.upperValue = sliderUpperValue
         slider.thumbBorderWidth = 1.5
@@ -64,7 +64,7 @@ class ViewController: UIViewController {
     }
     
     override func viewDidLayoutSubviews() {
-        let margin: CGFloat = 80
+        let margin: CGFloat = 20
         let width = view.bounds.width - 2 * margin
         let height: CGFloat = 40
         

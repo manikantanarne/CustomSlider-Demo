@@ -174,12 +174,23 @@ extension TwoWaySlider {
         let position = touch.location(in: self)
         
         if shapeLayerMin.isMoving == true {
-            if position.x >= thumbWidth/2 && position.x <= (bounds.width - thumbWidth/2) && position.x <= shapeLayerMax.position.x {
+            
+            if position.x == thumbWidth/2 {
+                lowerValue = minimumValue
+            }
+            
+            if position.x > thumbWidth/2 && position.x <= (bounds.width - thumbWidth/2) && position.x <= shapeLayerMax.position.x {
                 lowerValue = calculateValue(At: position)
                 lowerValue = (lowerValue < minimumValue) ? minimumValue : lowerValue
             }
+            
         }else if shapeLayerMax.isMoving == true {
-            if position.x <= (bounds.width - thumbWidth/2) && position.x >= thumbWidth/2 && position.x >= shapeLayerMin.position.x {
+            
+            if position.x == (bounds.width - thumbWidth/2) {
+                upperValue = maximumValue
+            }
+            
+            if position.x < (bounds.width - thumbWidth/2) && position.x >= thumbWidth/2 && position.x >= shapeLayerMin.position.x {
                 upperValue = calculateValue(At: position)
                 upperValue = (upperValue > maximumValue) ? maximumValue : upperValue
             }
@@ -266,7 +277,11 @@ extension TwoWaySlider {
             let value = minimumValue + CGFloat(stepsValue)
 //            print("value1-----> \(value)")
             
-            return value
+            if minimumValue > 10 {
+                return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
+            }else {
+                return value
+            }
             
         }else if xPosition > trackWidth*0.25 && xPosition <= (trackWidth*0.25 + trackWidth*0.175) {
             
@@ -286,7 +301,11 @@ extension TwoWaySlider {
             
 //            print("value2-----> \(value)")
             
-            return value
+            if minimumValue > 10 {
+                return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
+            }else {
+                return value
+            }
             
         }else if xPosition > (trackWidth*0.25 + trackWidth*0.175) && xPosition <= (trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375) {
             
@@ -304,7 +323,11 @@ extension TwoWaySlider {
             }
             print("value3-----> \(value)")
             
-            return value
+            if minimumValue > 10 {
+                return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
+            }else {
+                return value
+            }
             
         }else {
             
@@ -321,8 +344,51 @@ extension TwoWaySlider {
                 value = CGFloat((Int(value)/stepMultiplier) * stepMultiplier)
             }
             print("value4-----> \(value)")
-            return value
+            
+            if minimumValue > 10 {
+                return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
+            }else {
+                return value
+            }
         }
+    }
+    
+    private func getNearestToMultiple(number: Int, startingStepSize: Int) -> Int {
+
+            if number < 1000 {
+                return closestNumber(n: number, m: startingStepSize)
+            }else if (1000...9999).contains(number) {
+                return closestNumber(n: number, m: 100)
+            }else if (10000...99999).contains(number) {
+                return closestNumber(n: number, m: 1000)
+            }else {
+                return closestNumber(n: number, m: 10000)
+            }
+
+    }
+
+    private func getRoundedPosition(currentPosition: Int, min: Int) -> Int {
+        if (0...19).contains(min) {
+            return currentPosition
+        }else if (20...89).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 5)
+        }else if (90...159).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 10)
+        }else if  (160...399).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 20)
+        }else if (400...699).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 50)
+        }else if (700...999).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 100)
+        }else if  (10000...99999).contains(min) {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 1000)
+        }else {
+            return getNearestToMultiple(number: currentPosition, startingStepSize: 10000)
+        }
+    }
+    
+    private func closestNumber(n: Int, m: Int) -> Int {
+        return Int(((round(Double(n/m))) * Double(m)))
     }
     
     override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
