@@ -47,6 +47,8 @@ class TwoWaySlider: UIControl {
     public var trackHeight:CGFloat = 2
     public var trackTintColor:UIColor = UIColor.lightGray
     public var trackHighlightTintColor:UIColor = UIColor(red: 0.0/255.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    public var gradientStartColor:UIColor?
+    public var gradientEndColor:UIColor?
     
     //MARK: Private variables
     private var thumbWidth: CGFloat {
@@ -83,13 +85,13 @@ class TwoWaySlider: UIControl {
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        initializeLayers()
-        updateLayerFrames()
+//        initializeLayers()
+//        updateLayerFrames()
     }
     
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
-        initializeLayers()
+//        initializeLayers()
     }
     
     override public func layoutSublayers(of: CALayer) {
@@ -97,8 +99,18 @@ class TwoWaySlider: UIControl {
         updateLayerFrames()
     }
     
+    
+    public func initializeSlider() {
+        initializeLayers()
+        updateLayerFrames()
+    }
+    
     // Initialize track and thumb layers
     private func initializeLayers() {
+        
+        trackLayer.removeFromSuperlayer()
+        shapeLayerMin.removeFromSuperlayer()
+        shapeLayerMax.removeFromSuperlayer()
         
         trackLayer.slider = self
         trackLayer.contentsScale = UIScreen.main.scale
