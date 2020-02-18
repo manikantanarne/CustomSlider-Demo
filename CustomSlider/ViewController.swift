@@ -13,8 +13,8 @@ class ViewController: UIViewController {
     let slider = TwoWaySlider(frame: .zero)
     let lowerValueLbl = UILabel()
     let upperValueLbl = UILabel()
-    var sliderLowerValue:CGFloat = 10000.0
-    var sliderUpperValue:CGFloat = 100000.0
+    var sliderLowerValue:CGFloat = 100.0
+    var sliderUpperValue:CGFloat = 1000.0
     var previousMinPosition:CGFloat?
     var previousMaxPosition:CGFloat?
     
@@ -25,8 +25,8 @@ class ViewController: UIViewController {
         //Customize and add slider
        
         slider.backgroundColor = UIColor.clear
-        slider.minimumValue = 1120.0
-        slider.maximumValue = 1120000.0
+        slider.minimumValue = 10.0
+        slider.maximumValue = 10000.0
         slider.lowerValue = sliderLowerValue
         slider.upperValue = sliderUpperValue
         slider.thumbBorderWidth = 1.5
@@ -89,34 +89,81 @@ extension ViewController:TwoWaySliderProtocol {
         lowerValueLbl.frame.size.width = lowerValueLbl.intrinsicContentSize.width + 5
         upperValueLbl.frame.size.width = upperValueLbl.intrinsicContentSize.width + 5
         
-        lowerValueLbl.center.x = minThumbPosition.x
-        upperValueLbl.center.x = maxThumbPosition.x
-        lowerValueLbl.center.y = minThumbPosition.y
-        upperValueLbl.center.y = maxThumbPosition.y
         
-        if lowerValueLbl.frame.intersects(upperValueLbl.frame) {
-            if isMinThumbMoving == true {
-                if lowerValueLbl.frame.maxX < upperValueLbl.frame.maxX - upperValueLbl.bounds.width/2 {
-                    upperValueLbl.center.x = lowerValueLbl.frame.maxX + upperValueLbl.bounds.width/2
-                }else {
-                    if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
-                        lowerValueLbl.center.x = positionMin
-                        upperValueLbl.center.x = positionMax
+        let frameLowerLbl = CGRect(x: (minThumbPosition.x - lowerValueLbl.frame.size.width/2), y: lowerValueLbl.frame.origin.y, width: lowerValueLbl.frame.size.width, height: lowerValueLbl.frame.size.height)
+        let frameUpperLbl = CGRect(x: (maxThumbPosition.x - upperValueLbl.frame.size.width/2), y: upperValueLbl.frame.origin.y, width: upperValueLbl.frame.size.width, height: upperValueLbl.frame.size.height)
+        
+        if isMinThumbMoving == true {
+            
+            if frameLowerLbl.minX > slider.frame.minX {
+                
+                if frameLowerLbl.intersects(frameUpperLbl) {
+                    if (frameLowerLbl.maxX + frameUpperLbl.size.width) < slider.frame.maxX {
+                        if (maxThumbPosition.x - minThumbPosition.x) > 20 {
+                            upperValueLbl.frame.origin.x = frameLowerLbl.maxX
+                            lowerValueLbl.center.x = minThumbPosition.x
+                        }else {
+                            if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
+                                lowerValueLbl.center.x = positionMin
+                                upperValueLbl.center.x = positionMax
+                            }
+                        }
+                    }else {
+                        if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
+                            lowerValueLbl.center.x = positionMin
+                            upperValueLbl.center.x = positionMax
+                        }
                     }
+                }else {
+                    lowerValueLbl.center.x = minThumbPosition.x
                 }
-            }else if isMaxThumbMoving == true {
-                if upperValueLbl.frame.minX > lowerValueLbl.frame.maxX - lowerValueLbl.bounds.width/2 {
-                    lowerValueLbl.center.x = upperValueLbl.frame.minX - lowerValueLbl.bounds.width/2
-                }else {
-                    if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
-                        lowerValueLbl.center.x = positionMin
-                        upperValueLbl.center.x = positionMax
-                    }
+                
+            }else {
+                if let positionMin = previousMinPosition {
+                    lowerValueLbl.center.x = positionMin
                 }
             }
-//            upperValueLbl.center.x += lowerValueLbl.frame.maxX - upperValueLbl.frame.minX
+        }else if isMaxThumbMoving == true {
+            
+            if frameUpperLbl.maxX < slider.frame.maxX {
+                
+                if frameUpperLbl.intersects(frameLowerLbl) {
+                    
+                    if (frameUpperLbl.minX - lowerValueLbl.frame.size.width) > slider.frame.minX {
+                        
+                        if (maxThumbPosition.x - minThumbPosition.x) > 20 {
+                            lowerValueLbl.frame.origin.x = (frameUpperLbl.minX - lowerValueLbl.frame.size.width)
+                            upperValueLbl.center.x = maxThumbPosition.x
+                        }else {
+                            if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
+                                lowerValueLbl.center.x = positionMin
+                                upperValueLbl.center.x = positionMax
+                            }
+                        }
+                        
+                        
+                    }else {
+                        if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
+                            lowerValueLbl.center.x = positionMin
+                            upperValueLbl.center.x = positionMax
+                        }
+                    }
+                }else {
+                    upperValueLbl.center.x = maxThumbPosition.x
+                }
+                
+            }else {
+                if let positionMax = previousMaxPosition {
+                    upperValueLbl.center.x = positionMax
+                }
+            }
+        }else {
+            lowerValueLbl.center.x = minThumbPosition.x
+            upperValueLbl.center.x = maxThumbPosition.x
+            lowerValueLbl.center.y = minThumbPosition.y
+            upperValueLbl.center.y = maxThumbPosition.y
         }
-        
+ 
         previousMinPosition = lowerValueLbl.center.x
         previousMaxPosition = upperValueLbl.center.x
     }
