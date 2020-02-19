@@ -219,7 +219,7 @@ extension TwoWaySlider {
     internal func positionForThumb(For value:CGFloat) -> CGFloat {
         let trackWidth = bounds.width - thumbWidth
         
-        let rangeMultiplier:Int = (minimumValue > 10) ? Int(minimumValue)/10 : 1
+        let rangeMultiplier = (minimumValue > 10) ? (minimumValue)/10 : 1
         
         if value <= (110 * CGFloat(rangeMultiplier)) {
             
@@ -263,7 +263,9 @@ extension TwoWaySlider {
             let currentValue = value - (1000 * CGFloat(rangeMultiplier))
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
             let currentSectionWidth = trackWidth - previousSectionsWidth
-            let currentSectionSteps:CGFloat = 90
+            var currentSectionSteps:CGFloat = 90
+            let subtractionSteps = (maximumValue < (10000 * CGFloat(rangeMultiplier))) ? (10000 * CGFloat(rangeMultiplier)) - maximumValue : 0
+            currentSectionSteps -= subtractionSteps/(100 * rangeMultiplier)
             let stepSize = currentSectionWidth/currentSectionSteps
             let stepsMoved = currentValue/(100 * CGFloat(rangeMultiplier))
             let positionMovedTo = stepsMoved * stepSize
@@ -288,10 +290,8 @@ extension TwoWaySlider {
             let stepSize = currentSectionWidth/currentSectionSteps
             let positionMovedTo = xPosition - 0
             let stepsMoved = positionMovedTo/stepSize
-            print("stepsMoved-----> \(Int(stepsMoved))")
             let stepsValue = Int(stepsMoved) * (1 * rangeMultiplier)
             let value = minimumValue + CGFloat(stepsValue)
-//            print("value1-----> \(value)")
             
             if minimumValue > 10 {
                 return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
@@ -314,9 +314,7 @@ extension TwoWaySlider {
             if Int(value)%stepMultiplier != 0 {
                 value = CGFloat((Int(value)/stepMultiplier)*stepMultiplier)
             }
-            
-//            print("value2-----> \(value)")
-            
+                        
             if minimumValue > 10 {
                 return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
             }else {
@@ -337,7 +335,6 @@ extension TwoWaySlider {
             if Int(value)%stepMultiplier != 0 {
                 value = CGFloat((Int(value)/stepMultiplier)*stepMultiplier)
             }
-            print("value3-----> \(value)")
             
             if minimumValue > 10 {
                 return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
@@ -349,7 +346,9 @@ extension TwoWaySlider {
             
             let previousSectionsWidth = trackWidth*0.25 + trackWidth*0.175 + trackWidth*0.375
             let currentSectionWidth = trackWidth - previousSectionsWidth
-            let currentSectionSteps:CGFloat = 90
+            var currentSectionSteps:CGFloat = 90
+            let subtractionSteps = (maximumValue < (10000 * CGFloat(rangeMultiplier))) ? (10000 * CGFloat(rangeMultiplier)) - maximumValue : 0
+            currentSectionSteps -= subtractionSteps/(100 * CGFloat(rangeMultiplier))
             let stepSize = currentSectionWidth/currentSectionSteps
             let positionMovedTo = xPosition - previousSectionsWidth
             let stepsMoved = positionMovedTo/stepSize
@@ -359,7 +358,6 @@ extension TwoWaySlider {
             if Int(value)%stepMultiplier != 0 {
                 value = CGFloat((Int(value)/stepMultiplier) * stepMultiplier)
             }
-            print("value4-----> \(value)")
             
             if minimumValue > 10 {
                 return CGFloat(getRoundedPosition(currentPosition: Int(value), min: Int(minimumValue)))
