@@ -261,10 +261,26 @@ extension ViewController:TwoWaySliderProtocol {
                 }
             }
         }else {
-            lowerValueLbl.center.x = minThumbPosition.x
-            upperValueLbl.center.x = maxThumbPosition.x
+            
             lowerValueLbl.center.y = minThumbPosition.y
             upperValueLbl.center.y = maxThumbPosition.y
+            
+            if frameLowerLbl.minX >= slider.frame.minX {
+                lowerValueLbl.frame.origin.x = frameLowerLbl.origin.x
+            }else {
+                lowerValueLbl.frame.origin.x = slider.frame.minX
+            }
+            
+            if frameUpperLbl.maxX <= slider.frame.maxX {
+                upperValueLbl.frame.origin.x = frameUpperLbl.origin.x
+            }else {
+                upperValueLbl.frame.origin.x = slider.frame.maxX - frameUpperLbl.size.width
+            }
+            
+//            lowerValueLbl.center.x = minThumbPosition.x
+//            upperValueLbl.center.x = maxThumbPosition.x
+//            lowerValueLbl.center.y = minThumbPosition.y
+//            upperValueLbl.center.y = maxThumbPosition.y
         }
  
         previousMinPosition = lowerValueLbl.center.x
