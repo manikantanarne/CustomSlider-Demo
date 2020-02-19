@@ -193,8 +193,11 @@ extension ViewController:TwoWaySliderProtocol {
         upperValueLbl.frame.size.width = ((upperValueLbl.intrinsicContentSize.width + 10) > 40) ?
             (upperValueLbl.intrinsicContentSize.width + 20) : 40
         
-        let frameLowerLbl = CGRect(x: (minThumbPosition.x - lowerValueLbl.frame.size.width/2), y: lowerValueLbl.frame.origin.y, width: lowerValueLbl.frame.size.width, height: lowerValueLbl.frame.size.height)
-        let frameUpperLbl = CGRect(x: (maxThumbPosition.x - upperValueLbl.frame.size.width/2), y: upperValueLbl.frame.origin.y, width: upperValueLbl.frame.size.width, height: upperValueLbl.frame.size.height)
+        let lowerLabelXPosition = ((minThumbPosition.x - lowerValueLbl.frame.size.width/2) >= slider.frame.minX) ? (minThumbPosition.x - lowerValueLbl.frame.size.width/2) : slider.frame.minX
+        let frameLowerLbl = CGRect(x: lowerLabelXPosition, y: lowerValueLbl.frame.origin.y, width: lowerValueLbl.frame.size.width, height: lowerValueLbl.frame.size.height)
+        
+        let upperLabelXPosition = ((maxThumbPosition.x + upperValueLbl.frame.size.width/2) <= slider.frame.maxX) ? (maxThumbPosition.x - upperValueLbl.frame.size.width/2) : (slider.frame.maxX - upperValueLbl.frame.size.width)
+        let frameUpperLbl = CGRect(x: upperLabelXPosition, y: upperValueLbl.frame.origin.y, width: upperValueLbl.frame.size.width, height: upperValueLbl.frame.size.height)
         
         if isMinThumbMoving == true {
             
