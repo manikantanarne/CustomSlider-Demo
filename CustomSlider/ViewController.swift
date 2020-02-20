@@ -18,8 +18,8 @@ class ViewController: UIViewController {
     var previousMinPosition:CGFloat?
     var previousMaxPosition:CGFloat?
     
-    let lowerValueLbl = UILabel()
-    let upperValueLbl = UILabel()
+    let lowerValueTextField = UITextField()
+    let upperValueTextField = UITextField()
     var stackView = UIStackView()
     
     override func viewDidLoad() {
@@ -116,31 +116,35 @@ class ViewController: UIViewController {
     
     func initializeLabels() {
         
-        lowerValueLbl.frame = CGRect(x: 0, y: 0, width: 100, height: 28)
-        lowerValueLbl.text = "\(Int(sliderLowerValue))"
-        lowerValueLbl.textColor = UIColor.black
-        lowerValueLbl.textAlignment = .center
-        lowerValueLbl.font = UIFont.systemFont(ofSize: 11.0)
-        lowerValueLbl.backgroundColor = UIColor.white
-        lowerValueLbl.layer.cornerRadius = 14
-        lowerValueLbl.layer.borderWidth = 1.0
-        lowerValueLbl.layer.borderColor = UIColor.lightGray.cgColor
-        lowerValueLbl.clipsToBounds = true
+        lowerValueTextField.frame = CGRect(x: 0, y: 0, width: 100, height: 28)
+        lowerValueTextField.text = "\(Int(sliderLowerValue))"
+        lowerValueTextField.textColor = UIColor.black
+        lowerValueTextField.textAlignment = .center
+        lowerValueTextField.keyboardType = .numberPad
+        lowerValueTextField.font = UIFont.systemFont(ofSize: 11.0)
+        lowerValueTextField.backgroundColor = UIColor.white
+        lowerValueTextField.layer.cornerRadius = 14
+        lowerValueTextField.layer.borderWidth = 1.0
+        lowerValueTextField.layer.borderColor = UIColor.lightGray.cgColor
+        lowerValueTextField.clipsToBounds = true
+        lowerValueTextField.delegate = self
 
-        view.addSubview(lowerValueLbl)
+        view.addSubview(lowerValueTextField)
 
-        upperValueLbl.frame = CGRect(x: 0, y: 0, width: 50, height: 28)
-        upperValueLbl.text = "\(Int(sliderUpperValue))"
-        upperValueLbl.textColor = UIColor.black
-        upperValueLbl.textAlignment = .center
-        upperValueLbl.font = UIFont.systemFont(ofSize: 11.0)
-        upperValueLbl.backgroundColor = UIColor.white
-        upperValueLbl.layer.cornerRadius = 14
-        upperValueLbl.layer.borderWidth = 1.0
-        upperValueLbl.layer.borderColor = UIColor.lightGray.cgColor
-        upperValueLbl.clipsToBounds = true
+        upperValueTextField.frame = CGRect(x: 0, y: 0, width: 50, height: 28)
+        upperValueTextField.text = "\(Int(sliderUpperValue))"
+        upperValueTextField.textColor = UIColor.black
+        upperValueTextField.textAlignment = .center
+        upperValueTextField.keyboardType = .numberPad
+        upperValueTextField.font = UIFont.systemFont(ofSize: 11.0)
+        upperValueTextField.backgroundColor = UIColor.white
+        upperValueTextField.layer.cornerRadius = 14
+        upperValueTextField.layer.borderWidth = 1.0
+        upperValueTextField.layer.borderColor = UIColor.lightGray.cgColor
+        upperValueTextField.clipsToBounds = true
+        upperValueTextField.delegate = self
 
-        view.addSubview(upperValueLbl)
+        view.addSubview(upperValueTextField)
     }
 
     @objc func actionOnCurrencyBtns(sender:UIButton) {
@@ -172,8 +176,8 @@ class ViewController: UIViewController {
         
         initializeSlider()
         
-        lowerValueLbl.text = "\(Int(sliderLowerValue))"
-        upperValueLbl.text = "\(Int(sliderUpperValue))"
+        lowerValueTextField.text = "\(Int(sliderLowerValue))"
+        upperValueTextField.text = "\(Int(sliderUpperValue))"
     }
 
 }
@@ -183,21 +187,23 @@ extension ViewController:TwoWaySliderProtocol {
     func sliderValueChanges(lowerValue: Double, upperValue: Double) {
         sliderLowerValue = CGFloat(lowerValue)
         sliderUpperValue = CGFloat(upperValue)
-        lowerValueLbl.text = "\(Int(lowerValue))"
-        upperValueLbl.text = "\(Int(upperValue))"
+        lowerValueTextField.text = "\(Int(lowerValue))"
+        upperValueTextField.text = "\(Int(upperValue))"
     }
     
     func positionChangesForThumbs(minThumbPosition: CGPoint, maxThumbPosition: CGPoint, isMinThumbMoving:Bool, isMaxThumbMoving:Bool) {
         
-        lowerValueLbl.frame.size.width = ((lowerValueLbl.intrinsicContentSize.width + 10) > 40) ? (lowerValueLbl.intrinsicContentSize.width + 20) : 40
-        upperValueLbl.frame.size.width = ((upperValueLbl.intrinsicContentSize.width + 10) > 40) ?
-            (upperValueLbl.intrinsicContentSize.width + 20) : 40
+        view.endEditing(true)
         
-        let lowerLabelXPosition = ((minThumbPosition.x - lowerValueLbl.frame.size.width/2) >= slider.frame.minX) ? (minThumbPosition.x - lowerValueLbl.frame.size.width/2) : slider.frame.minX
-        let frameLowerLbl = CGRect(x: lowerLabelXPosition, y: lowerValueLbl.frame.origin.y, width: lowerValueLbl.frame.size.width, height: lowerValueLbl.frame.size.height)
+        lowerValueTextField.frame.size.width = ((lowerValueTextField.intrinsicContentSize.width + 10) > 40) ? (lowerValueTextField.intrinsicContentSize.width + 20) : 40
+        upperValueTextField.frame.size.width = ((upperValueTextField.intrinsicContentSize.width + 10) > 40) ?
+            (upperValueTextField.intrinsicContentSize.width + 20) : 40
         
-        let upperLabelXPosition = ((maxThumbPosition.x + upperValueLbl.frame.size.width/2) <= slider.frame.maxX) ? (maxThumbPosition.x - upperValueLbl.frame.size.width/2) : (slider.frame.maxX - upperValueLbl.frame.size.width)
-        let frameUpperLbl = CGRect(x: upperLabelXPosition, y: upperValueLbl.frame.origin.y, width: upperValueLbl.frame.size.width, height: upperValueLbl.frame.size.height)
+        let lowerLabelXPosition = ((minThumbPosition.x - lowerValueTextField.frame.size.width/2) >= slider.frame.minX) ? (minThumbPosition.x - lowerValueTextField.frame.size.width/2) : slider.frame.minX
+        let frameLowerLbl = CGRect(x: lowerLabelXPosition, y: lowerValueTextField.frame.origin.y, width: lowerValueTextField.frame.size.width, height: lowerValueTextField.frame.size.height)
+        
+        let upperLabelXPosition = ((maxThumbPosition.x + upperValueTextField.frame.size.width/2) <= slider.frame.maxX) ? (maxThumbPosition.x - upperValueTextField.frame.size.width/2) : (slider.frame.maxX - upperValueTextField.frame.size.width)
+        let frameUpperLbl = CGRect(x: upperLabelXPosition, y: upperValueTextField.frame.origin.y, width: upperValueTextField.frame.size.width, height: upperValueTextField.frame.size.height)
         
         if isMinThumbMoving == true {
             
@@ -206,27 +212,27 @@ extension ViewController:TwoWaySliderProtocol {
                 if frameLowerLbl.intersects(frameUpperLbl) {
                     if (frameLowerLbl.maxX + frameUpperLbl.size.width) < slider.frame.maxX {
                         if (maxThumbPosition.x - minThumbPosition.x) > 20 {
-                            upperValueLbl.frame.origin.x = frameLowerLbl.maxX
-                            lowerValueLbl.center.x = minThumbPosition.x
+                            upperValueTextField.frame.origin.x = frameLowerLbl.maxX
+                            lowerValueTextField.center.x = minThumbPosition.x
                         }else {
                             if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
-                                lowerValueLbl.center.x = positionMin
-                                upperValueLbl.center.x = positionMax
+                                lowerValueTextField.center.x = positionMin
+                                upperValueTextField.center.x = positionMax
                             }
                         }
                     }else {
                         if let positionMin = previousMinPosition, let positionMax = previousMaxPosition {
-                            lowerValueLbl.center.x = positionMin
-                            upperValueLbl.center.x = positionMax
+                            lowerValueTextField.center.x = positionMin
+                            upperValueTextField.center.x = positionMax
                         }
                     }
                 }else {
-                    lowerValueLbl.center.x = minThumbPosition.x
+                    lowerValueTextField.center.x = minThumbPosition.x
                 }
                 
             }else {
                 if let positionMin = previousMinPosition {
-                    lowerValueLbl.center.x = positionMin
+                    lowerValueTextField.center.x = positionMin
                 }
             }
         }else if isMaxThumbMoving == true {
@@ -235,59 +241,120 @@ extension ViewController:TwoWaySliderProtocol {
                 
                 if frameUpperLbl.intersects(frameLowerLbl) {
                     
-                    if (frameUpperLbl.minX - lowerValueLbl.frame.size.width) > slider.frame.minX {
+                    if (frameUpperLbl.minX - lowerValueTextField.frame.size.width) > slider.frame.minX {
                         
                         if (maxThumbPosition.x - minThumbPosition.x) > 20 {
-                            lowerValueLbl.frame.origin.x = (frameUpperLbl.minX - lowerValueLbl.frame.size.width)
-                            upperValueLbl.center.x = maxThumbPosition.x
+                            lowerValueTextField.frame.origin.x = (frameUpperLbl.minX - lowerValueTextField.frame.size.width)
+                            upperValueTextField.center.x = maxThumbPosition.x
                         }else {
                             if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
-                                lowerValueLbl.center.x = positionMin
-                                upperValueLbl.center.x = positionMax
+                                lowerValueTextField.center.x = positionMin
+                                upperValueTextField.center.x = positionMax
                             }
                         }
                         
                         
                     }else {
                         if let positionMax = previousMaxPosition, let positionMin = previousMinPosition {
-                            lowerValueLbl.center.x = positionMin
-                            upperValueLbl.center.x = positionMax
+                            lowerValueTextField.center.x = positionMin
+                            upperValueTextField.center.x = positionMax
                         }
                     }
                 }else {
-                    upperValueLbl.center.x = maxThumbPosition.x
+                    upperValueTextField.center.x = maxThumbPosition.x
                 }
                 
             }else {
                 if let positionMax = previousMaxPosition {
-                    upperValueLbl.center.x = positionMax
+                    upperValueTextField.center.x = positionMax
                 }
             }
         }else {
             
-            lowerValueLbl.center.y = minThumbPosition.y
-            upperValueLbl.center.y = maxThumbPosition.y
+            lowerValueTextField.center.y = minThumbPosition.y
+            upperValueTextField.center.y = maxThumbPosition.y
             
-            if frameLowerLbl.minX >= slider.frame.minX {
-                lowerValueLbl.frame.origin.x = frameLowerLbl.origin.x
+            if frameLowerLbl.minX > slider.frame.minX {
+                if frameLowerLbl.intersects(frameUpperLbl) {
+                    lowerValueTextField.frame.origin.x = frameUpperLbl.minX - frameLowerLbl.size.width
+                }else {
+                    lowerValueTextField.frame.origin.x = frameLowerLbl.minX
+                }
             }else {
-                lowerValueLbl.frame.origin.x = slider.frame.minX
+                lowerValueTextField.frame.origin.x = slider.frame.minX
             }
             
             if frameUpperLbl.maxX <= slider.frame.maxX {
-                upperValueLbl.frame.origin.x = frameUpperLbl.origin.x
+                if frameUpperLbl.intersects(frameLowerLbl) {
+                    upperValueTextField.frame.origin.x = lowerValueTextField.frame.maxX
+                }else {
+                    upperValueTextField.frame.origin.x = frameUpperLbl.minX
+                }
             }else {
-                upperValueLbl.frame.origin.x = slider.frame.maxX - frameUpperLbl.size.width
+                upperValueTextField.frame.origin.x = slider.frame.maxX - frameUpperLbl.size.width
             }
-            
-//            lowerValueLbl.center.x = minThumbPosition.x
-//            upperValueLbl.center.x = maxThumbPosition.x
-//            lowerValueLbl.center.y = minThumbPosition.y
-//            upperValueLbl.center.y = maxThumbPosition.y
         }
  
-        previousMinPosition = lowerValueLbl.center.x
-        previousMaxPosition = upperValueLbl.center.x
+        previousMinPosition = lowerValueTextField.center.x
+        previousMaxPosition = upperValueTextField.center.x
     }
 }
 
+
+extension ViewController:UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        textField.resignFirstResponder()
+        
+        if textField == lowerValueTextField {
+            if let text = textField.text, text.count > 0, let enteredValue =  Int(text) {
+                if CGFloat(enteredValue) >= sliderMinValue {
+                    if CGFloat(enteredValue) <= sliderUpperValue {
+                        sliderLowerValue = CGFloat(enteredValue)
+                        initializeSlider()
+                    }else {
+                        lowerValueTextField.text = "\(Int(sliderLowerValue))"
+                        showAlertWith(Message: "Value should be less than or equal to selected upper value")
+                    }
+                }else {
+                    lowerValueTextField.text = "\(Int(sliderLowerValue))"
+                    showAlertWith(Message: "Value should be greater than or equal to minimum value")
+                }
+            }else {
+                lowerValueTextField.text = "\(Int(sliderLowerValue))"
+                showAlertWith(Message: "Value entered is not valid")
+            }
+        }else if textField == upperValueTextField {
+            if let text = textField.text, text.count > 0, let enteredValue = Int(text) {
+                if CGFloat(enteredValue) <= sliderMaxValue {
+                    if CGFloat(enteredValue) >= sliderLowerValue {
+                        sliderUpperValue = CGFloat(enteredValue)
+                        initializeSlider()
+                    }else {
+                        upperValueTextField.text = "\(Int(sliderUpperValue))"
+                        showAlertWith(Message: "Value should be greater than or equal to selected lower value")
+                    }
+                }else {
+                    upperValueTextField.text = "\(Int(sliderUpperValue))"
+                    showAlertWith(Message: "Value should be less than or equal to maximum value")
+                }
+            }else {
+                lowerValueTextField.text = "\(Int(sliderUpperValue))"
+                showAlertWith(Message: "Value entered is not valid")
+            }
+        }
+        
+        return true
+    }
+    
+    
+    //MARK: Show Alert
+    func showAlertWith(Message message:String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+            self.dismiss(animated: true, completion: nil)
+        }))
+        
+        present(alert, animated: true, completion: nil)
+    }
+}
